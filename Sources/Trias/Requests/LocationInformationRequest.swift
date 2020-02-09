@@ -1,22 +1,23 @@
 import XMLCoder
 
 public struct LocationInformationRequest: Encodable {
-    public let locationReference: LocationReference
-    public let restrictions: Restrictions
+    public let initialInput: InitialLocationInput?
+    public let locationReference: LocationReference?
+    public let restrictions: LocationParameter?
 
-    private enum CodingKeys: String, CodingKey {
-        case locationReference = "LocationRef"
-        case restrictions = "Restrictions"
-    }
-
-    public init(name: String, restrictions: Restrictions = .default) {
-        self.locationReference = LocationReference(locationName: LocationName(text: name))
-        self.restrictions = restrictions
-    }
-
-    public init(locationReference: LocationReference, restrictions: Restrictions) {
+    public init(initialInput: InitialLocationInput? = nil,
+                locationReference: LocationReference? = nil,
+                restrictions: LocationParameter? = nil) {
+        assert(initialInput != nil || locationReference != nil)
+        self.initialInput = initialInput
         self.locationReference = locationReference
         self.restrictions = restrictions
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case initialInput = "InitialInput"
+        case locationReference = "LocationRef"
+        case restrictions = "Restrictions"
     }
 }
 
@@ -25,33 +26,3 @@ extension LocationInformationRequest: Request {
 }
 
 extension LocationInformationRequest: Payload {}
-
-public struct LocationReference: Encodable {
-    public let locationName: LocationName
-
-    private enum CodingKeys: String, CodingKey {
-        case locationName = "LocationName"
-    }
-}
-
-public struct LocationName: Codable {
-    public let text: String
-
-    private enum CodingKeys: String, CodingKey {
-        case text = "Text"
-    }
-}
-
-public struct Restrictions: Codable {
-    public let type: String
-    public let includePtModes: Bool
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "Type"
-        case includePtModes = "IncludePtModes"
-    }
-
-    public static var `default`: Restrictions {
-        Restrictions(type: "stop", includePtModes: true)
-    }
-}

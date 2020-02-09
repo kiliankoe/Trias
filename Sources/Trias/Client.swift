@@ -2,8 +2,10 @@ import Foundation
 import XMLCoder
 
 public class Client {
-    let url: URL
-    let requestorRef: String
+    public var url: URL
+    public var requestorRef: String
+
+    public var xmlHeader = XMLHeader(version: 1.0, encoding: "UTF-8", standalone: nil)
 
     public init(url: URL, requestorRef: String) {
         self.url = url
@@ -11,7 +13,7 @@ public class Client {
     }
 
     public func send<R: Request & Payload>(request: R,
-                                           session: URLSession,
+                                           session: URLSession = .shared,
                                            completion: @escaping (Result<R.Response, TriasError>) -> Void) {
         let message = TriasOutgoing(request: ServiceRequest(timestamp: Date(),
                                                             requestorRef: self.requestorRef,
@@ -22,11 +24,15 @@ public class Client {
 
         var requestData: Data
         do {
-            requestData = try encoder.encode(message, withRootKey: "Trias", header: XMLHeader(version: 1.0, encoding: "UTF-8"))
+            requestData = try encoder.encode(message, withRootKey: "Trias", header: self.xmlHeader)
         } catch {
             completion(.failure(.other(error)))
             return
         }
+
+        #if DEBUG
+        print("↗️ Sending Trias request:\n\(String(data: requestData, encoding: .utf8)!)\n")
+        #endif
 
         var urlRequest = URLRequest(url: self.url)
         urlRequest.httpMethod = "POST"
@@ -34,7 +40,7 @@ public class Client {
         urlRequest.addValue("text/xml", forHTTPHeaderField: "Content-Type")
 
         let task = session.dataTask(with: urlRequest) { data, response, error in
-            print(data, response, error)
+            print("↘️ Received response:\n\(String(data: data!, encoding: .utf8)!)\n")
             completion(.failure(.placeholder))
         }
 
@@ -44,26 +50,14 @@ public class Client {
 
 extension Client {
     public func requestLocationInformation(name: String,
-                                           restrictions: Restrictions = .default,
                                            date: Date = Date(),
                                            session: URLSession = .shared,
                                            completion: @escaping (Result<LocationInformationRequest.Response, TriasError>) -> Void) {
-        let request = LocationInformationRequest(name: name, restrictions: restrictions)
-        #if DEBUG
-        print("Sending request: \(request)")
-        #endif
+        let request = LocationInformationRequest(initialInput: InitialLocationInput(locationName: name,
+                                                                                    geoPosition: nil,
+                                                                                    geoRestriction: nil),
+                                                 locationReference: nil,
+                                                 restrictions: nil)
         send(request: request, session: session, completion: completion)
     }
 }
-
-public protocol Request: Encodable {
-    associatedtype Response
-}
-
-public protocol Response {}
-public enum TriasError: Error {
-    case other(Error)
-    case placeholder
-}
-
-public struct LocationInformationResponse: Response {}

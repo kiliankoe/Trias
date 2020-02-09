@@ -1,0 +1,3 @@
+public struct LocationInformationResponse: Response {
+
+}
