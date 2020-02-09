@@ -49,13 +49,15 @@ public class Client {
 }
 
 extension Client {
-    public func requestLocationInformation(name: String,
+    public func requestLocationInformation(for name: String,
+                                           closeTo geoPosition: GeoPosition? = nil,
+                                           restrictedTo geoRestriction: GeoRestrictions? = nil,
                                            date: Date = Date(),
                                            session: URLSession = .shared,
                                            completion: @escaping (Result<LocationInformationRequest.Response, TriasError>) -> Void) {
         let request = LocationInformationRequest(initialInput: InitialLocationInput(locationName: name,
-                                                                                    geoPosition: nil,
-                                                                                    geoRestriction: nil),
+                                                                                    geoPosition: geoPosition,
+                                                                                    geoRestriction: geoRestriction),
                                                  locationReference: nil,
                                                  restrictions: nil)
         send(request: request, session: session, completion: completion)

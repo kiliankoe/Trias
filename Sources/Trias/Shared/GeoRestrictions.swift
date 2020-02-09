@@ -53,6 +53,7 @@ public struct GeoRectangle: Codable {
 }
 
 public struct GeoArea: Codable {
+    #warning("TODO: Check if this works.")
     public let polylinePoints: [GeoPosition]
 
     public init(polylinePoints: [GeoPosition]) {
