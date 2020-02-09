@@ -4,6 +4,8 @@ This aims to be a client library for TRIAS systems enabling you to access public
 not aim to implement TRIAS as closely as possible, but only as far as it makes sense when using it with Swift. Native types and ease of use
 are preferred, but customizability and complex requests should still be possible.
 
+Official documentation can be found [here [PDF]](https://www.vdv.de/431-2-sdsv1.2.pdfx?forced=false).
+
 **This library is still very much a work-in-progress and should be considered non-functional for the time being.**
 
 ## Installation
