@@ -1,3 +1,3 @@
-# TRIAS
+# Trias
 
-A description of this package.
+*WIP*
